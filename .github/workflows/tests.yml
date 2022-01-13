@@ -18,12 +18,12 @@ jobs:
           - os: ubuntu-latest
             NVIM_NIGHTLY: nvim-linux64.tar.gz
             NVIM_BIN_PATH: nvim-linux64/bin
-            RG_NIGHTLY: ripgrep-13.0.0-x86_64-unknown-linux-musl.tar.gz
+            RG_FILE: ripgrep-13.0.0-x86_64-unknown-linux-musl.tar.gz
             RG_BIN_PATH: ripgrep-13.0.0-x86_64-unknown-linux-musl
           - os: macos-latest
             NVIM_NIGHTLY: nvim-macos.tar.gz
             NVIM_BIN_PATH: nvim-osx64/bin
-            RG_NIGHTLY: ripgrep-13.0.0-x86_64-apple-darwin.tar.gz
+            RG_FILE: ripgrep-13.0.0-x86_64-apple-darwin.tar.gz
             RG_BIN_PATH: ripgrep-13.0.0-x86_64-apple-darwin
 
     name: Run tests
@@ -48,15 +48,17 @@ jobs:
 
       - name: Install ripgrep
         run: |
-          curl -LO "https://github.com/BurntSushi/ripgrep/releases/download/13.0.0/${{ matrix.RG_NIGHTLY }}"
-          tar xzf ${{ matrix.RG_NIGHTLY }}
+          curl -LO "https://github.com/BurntSushi/ripgrep/releases/download/13.0.0/${{ matrix.RG_FILE }}"
+          tar xzf ${{ matrix.RG_FILE }}
           echo "$(pwd)/${{ matrix.RG_BIN_PATH }}" > $GITHUB_PATH
 
       - name: yarn install
-        run: yarn install --frozen-lockfile
+        run: |
+          yarn install --frozen-lockfile
+          echo "$(pwd)/node_modules/.bin" > $GITHUB_PATH
 
-      - name: build tree-sitter grammar
-        run: nvim --headless -u "test/helpers/vimrc" -c "TSInstall ruby" -c "q"
+      - name: Compile tree-sitter grammar
+        run: nvim --headless -u "$(pwd)/test/helpers/vimrc" -c "TSInstallSync ruby" -c "q"
 
       - name: Run tests
         env:
@@ -64,7 +66,6 @@ jobs:
         run: |
           echo $PATH
           which nvim
-          nvim --version
           which rg
           rg --version
           yarn test
