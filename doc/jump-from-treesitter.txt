@@ -1,0 +1,19 @@
+*jump-from-treesitter.txt*                             A jump to definition tool
+
+Version: 0.0.0-beta.1
+Author: Keiran O'Leary <hello at keiranoleary.com>
+
+==============================================================================
+OVERVIEW                                         *jump-from-treesitter-overview*
+
+A jump to definition tool for nvim using treesitter
+
+==============================================================================
+USAGE                                               *jump-from-treesitter-usage*
+
+The primary function to invoke is:
+jump_from_treesitter#jump()
+
+You may wish to invoke it via a mapping such as:
+nmap <silent> gd :call jump_from_treesitter#jump()<CR>
+

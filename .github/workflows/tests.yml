@@ -1,0 +1,70 @@
+name: Tests
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+
+jobs:
+  test:
+    strategy:
+      fail-fast: true
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        node: ['12']
+        cc: [gcc]
+        include:
+          - os: ubuntu-latest
+            NVIM_NIGHTLY: nvim-linux64.tar.gz
+            NVIM_BIN_PATH: nvim-linux64/bin
+            RG_NIGHTLY: ripgrep-13.0.0-x86_64-unknown-linux-musl.tar.gz
+            RG_BIN_PATH: ripgrep-13.0.0-x86_64-unknown-linux-musl
+          - os: macos-latest
+            NVIM_NIGHTLY: nvim-macos.tar.gz
+            NVIM_BIN_PATH: nvim-osx64/bin
+            RG_NIGHTLY: ripgrep-13.0.0-x86_64-apple-darwin.tar.gz
+            RG_BIN_PATH: ripgrep-13.0.0-x86_64-apple-darwin
+
+    name: Run tests
+    runs-on: ${{ matrix.os }}
+    env:
+      CC: ${{ matrix.cc }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Set Node.js
+        uses: actions/setup-node@v2
+        with:
+          cache: yarn
+          node-version: ${{ matrix.node }}
+
+      - name: Install neovim
+        run: |
+          curl -LO "https://github.com/neovim/neovim/releases/download/nightly/${{ matrix.NVIM_NIGHTLY }}"
+          tar xzf ${{ matrix.NVIM_NIGHTLY }}
+          echo "$(pwd)/${{ matrix.NVIM_BIN_PATH }}" > $GITHUB_PATH
+
+      - name: Install ripgrep
+        run: |
+          curl -LO "https://github.com/BurntSushi/ripgrep/releases/download/13.0.0/${{ matrix.RG_NIGHTLY }}"
+          tar xzf ${{ matrix.RG_NIGHTLY }}
+          echo "$(pwd)/${{ matrix.RG_BIN_PATH }}" > $GITHUB_PATH
+
+      - name: yarn install
+        run: yarn install --frozen-lockfile
+
+      - name: build tree-sitter grammar
+        run: nvim --headless -u "test/helpers/vimrc" -c "TSInstall ruby" -c "q"
+
+      - name: Run tests
+        env:
+          NODE_ENV: test
+        run: |
+          echo $PATH
+          which nvim
+          nvim --version
+          which rg
+          rg --version
+          yarn test
