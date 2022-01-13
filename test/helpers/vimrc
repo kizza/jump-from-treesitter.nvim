@@ -6,7 +6,6 @@ let s:plugin = expand('<sfile>:h:h:h')
 
 execute 'set runtimepath+='.s:plugin
 
-" execute 'set runtimepath+='.s:plugin.'/test/dependencies'
 execute 'set runtimepath+='.s:plugin.'/node_modules/nvim-treesitter'
 
 execute 'cd '.s:plugin

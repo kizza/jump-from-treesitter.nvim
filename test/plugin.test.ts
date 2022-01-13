@@ -55,6 +55,6 @@ describe("jump-from-treesitter", () => {
           `echo luaeval("require'jump-from-treesitter'.get_text()")`
         )
         assert.equal(result, output, `Trying ${input}`);
-      }));
+      }))
   })
 });
