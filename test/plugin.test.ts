@@ -19,6 +19,14 @@ describe("jump-from-treesitter", () => {
     withVim(async nvim => {
       await nvim.commandOutput(`echo jump_from_treesitter#jump_to("Module::Token")`)
       const currentBufferPath = await nvim.commandOutput(`echo expand("%")`)
+      console.log("foo", currentBufferPath)
+      assert.equal(currentBufferPath, "test/examples.rb")
+    }));
+
+  it("handles method matches", () =>
+    withVim(async nvim => {
+      await nvim.commandOutput(`echo jump_from_treesitter#jump_to("method")`)
+      const currentBufferPath = await nvim.commandOutput(`echo expand("%")`)
       assert.equal(currentBufferPath, "test/examples.rb")
     }));
 

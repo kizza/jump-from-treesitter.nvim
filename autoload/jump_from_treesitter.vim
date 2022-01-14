@@ -23,7 +23,15 @@ function! jump_from_treesitter#jump_to(token) abort
 endfunction
 
 function! jump_from_treesitter#grep(token) abort
-  let output = execute('silent !rg "^[^\#]*class '.a:token.'(\s|$)" -l')
+  if tolower(a:token) ==# a:token
+    return jump_from_treesitter#grep_with('^[^\#]*def '.a:token.'(\s|$|\()')
+  else
+    return jump_from_treesitter#grep_with('^[^\#]*class '.a:token.'(\s|$)')
+  end
+endfunction
+
+function! jump_from_treesitter#grep_with(query) abort
+  let output = execute('silent !rg "'.a:query.'" --vimgrep')
   redraw!
   let lines = split(output, "\n")
   if len(lines) == 4 && lines[3] == "shell returned 1"
