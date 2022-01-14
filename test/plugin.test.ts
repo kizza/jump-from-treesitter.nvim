@@ -30,6 +30,13 @@ describe("jump-from-treesitter", () => {
       assert.equal(currentBufferPath, "test/examples.rb")
     }));
 
+  it("jumps to matched line number", () =>
+    withVim(async nvim => {
+      await nvim.commandOutput(`echo jump_from_treesitter#jump_to("method")`)
+      const currentLineNumber = await nvim.commandOutput(`echo line(".")`)
+      assert.equal(currentLineNumber, "2")
+    }));
+
   it("handles zero matches", () =>
     withVim(async nvim => {
       const result = await nvim.commandOutput(`call jump_from_treesitter#jump_to("F_oo")`)
