@@ -1,4 +1,7 @@
+
 # A jump to definition tool for nvim (using treesitter)
+
+![example workflow](https://github.com/kizza/jump-from-treesitter.nvim/actions/workflows/tests.yml/badge.svg)
 
 - Currently built for use with ruby only - as my mileage with [Solargraph](https://solargraph.org/) (via [coc-solargraph](https://github.com/neoclide/coc-solargraph)) leaves some definitions wanting (other language servers seem to work great!)
 - Uses nvim's newly builtin tree-sitter  to parse the tokens to lookup
