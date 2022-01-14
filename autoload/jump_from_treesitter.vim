@@ -51,7 +51,10 @@ endfunction
 
 function! jump_from_treesitter#handle_results(results)
   if len(a:results) == 1
-    execute("edit ".a:results[0])
+    let bits = split(a:results[0], ":")
+    let path = bits[0]
+    let line_number = bits[1]
+    execute("edit +".line_number." ".path)
   else
     call fzf#run(
       \   fzf#wrap('files', fzf#vim#with_preview({
