@@ -42,7 +42,7 @@ call CocAction("jumpDefinition")
 - [fzf.vim](https://github.com/junegunn/fzf.vim) (to display multiple matches)
 
 I have something like this...
-```
+```vim
 Plug 'nvim-treesitter/nvim-treesitter'
 Plug 'junegunn/fzf.vim'
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
