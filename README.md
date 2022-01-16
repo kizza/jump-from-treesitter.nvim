@@ -41,6 +41,14 @@ call CocAction("jumpDefinition")
 - [ripgrep](https://github.com/BurntSushi/ripgrep) (to grep for results)
 - [fzf.vim](https://github.com/junegunn/fzf.vim) (to display multiple matches)
 
+I have something like this...
+```
+Plug 'nvim-treesitter/nvim-treesitter'
+Plug 'junegunn/fzf.vim'
+Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
+```
+
+
 ## Future plans
 
 - To iterate and improve the grep approaches
