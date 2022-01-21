@@ -18,8 +18,8 @@ function! jump_from_treesitter#jump_to(token) abort
       call jump_from_treesitter#jump_to(klass)
     else
       echo 'No definition found for "'.a:token.'"'
-      if exists("*CocAction")
-        call CocAction('jumpDefinition')
+      if g:jump_from_treesitter_fallback != ""
+        execute(g:jump_from_treesitter_fallback)
       end
     end
   end

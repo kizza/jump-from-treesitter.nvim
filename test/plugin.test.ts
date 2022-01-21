@@ -39,10 +39,10 @@ describe("jump-from-treesitter", () => {
 
   it("handles zero matches", () =>
     withVim(async nvim => {
+      await nvim.setVar("jump_from_treesitter_fallback", "echo 'custom fallback'")
       const result = await nvim.commandOutput(`call jump_from_treesitter#jump_to("F_oo")`)
-      assert.equal(result, 'No definition found for "F_oo"')
+      assert(result.indexOf("custom fallback") > 0)
     }));
-
   [
     [
       ["class |Foo", "end"],

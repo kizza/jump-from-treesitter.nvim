@@ -34,6 +34,14 @@ It will currently fallback to [coc's](https://github.com/neoclide/coc.nvim) impl
 call CocAction("jumpDefinition")
 ```
 
+## Configuration
+
+The global variable `g:jump_from_treesitter_fallback` will be invoked as a fallback.
+You can use it to fallback to an alternative definition tool such as `coc`.
+```
+let g:jump_from_treesitter_fallback = "call CocAction('jumpDefinition')"
+```
+
 ## Dependencies
 
 - [nvim](https://neovim.io/)
