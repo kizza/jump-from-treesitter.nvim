@@ -9,9 +9,9 @@ function! jump_from_treesitter#jump()
 endfunction
 
 function! jump_from_treesitter#jump_to(token) abort
-  let results = jump_from_treesitter#grep(a:token)
+  let [results, query] = jump_from_treesitter#grep(a:token)
   if len(results) > 0
-    call jump_from_treesitter#handle_results(results)
+    call jump_from_treesitter#handle_results(results, query)
   else
     let klass = jump_from_treesitter#parse_class(a:token)
     if klass != ""
@@ -38,9 +38,9 @@ function! jump_from_treesitter#grep_with(query) abort
   redraw!
   let lines = split(output, "\n")
   if len(lines) == 4 && lines[3] == "shell returned 1"
-    return []
+    return [[], a:query]
   else
-    return lines[2:]
+    return [lines[2:], a:query]
   end
 endfunction
 
@@ -52,17 +52,16 @@ function! jump_from_treesitter#parse_class(text) abort
   end
 endfunction
 
-function! jump_from_treesitter#handle_results(results)
+function! jump_from_treesitter#handle_results(results, query)
   if len(a:results) == 1
     let bits = split(a:results[0], ":")
     let path = bits[0]
     let line_number = bits[1]
     execute("edit +".line_number." ".path)
   else
-    call fzf#run(
-      \   fzf#wrap('files', fzf#vim#with_preview({
-      \     'source': reverse(a:results)
-      \   })
-      \ ))
+    call fzf#vim#grep(
+      \ 'rg --column --line-number --no-heading --color=always --smart-case -- '.shellescape(a:query), 1,
+      \ fzf#vim#with_preview()
+      \ )
   end
 endfunction
