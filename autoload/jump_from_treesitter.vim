@@ -17,9 +17,10 @@ function! jump_from_treesitter#jump_to(token) abort
     if klass != ""
       call jump_from_treesitter#jump_to(klass)
     else
-      echo 'No definition found for "'.a:token.'"'
-      if g:jump_from_treesitter_fallback != ""
+      if exists("g:jump_from_treesitter_fallback")
         execute(g:jump_from_treesitter_fallback)
+      else
+        echo 'No definition found for "'.a:token.'". Set g:jump_from_treesitter_fallback to set a fallback'
       end
     end
   end
