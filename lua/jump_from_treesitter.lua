@@ -21,7 +21,7 @@ function M.parse_token_from_string(text, column)
   return {ts_utils.get_vim_range({scope:range()})}
 end
 
-function M.parse_token_from_buffer()
+function M.parse_token_under_cursor()
   local current_node = ts_utils.get_node_at_cursor()
   if not current_node then
     return "None"
