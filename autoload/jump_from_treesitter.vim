@@ -46,9 +46,9 @@ function! jump_from_treesitter#grep(token) abort
   " A mtehod
   elseif tolower(a:token) ==# a:token
     return jump_from_treesitter#grep_with('^[^\#]*def '.a:token.'(\s|$|\()')
-  " A class
+  " A class/module
   else
-    return jump_from_treesitter#grep_with('^[^\#]*class '.a:token.'(\s|$)')
+    return jump_from_treesitter#grep_with('^[^\#]*(module|class) '.a:token.'(\s|$)')
   end
 endfunction
 

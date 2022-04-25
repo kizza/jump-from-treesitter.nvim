@@ -6,3 +6,6 @@ end
 
 class Module::Token
 end
+
+module SingleModule
+end

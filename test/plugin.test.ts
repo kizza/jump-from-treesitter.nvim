@@ -57,6 +57,13 @@ describe("jump-from-treesitter", () => {
       assert.equal(currentBufferPath, "test/examples.rb")
     }));
 
+  it("handles module matches", () =>
+    withVim(async nvim => {
+      await nvim.commandOutput(`echo jump_from_treesitter#jump_to("SingleModule")`)
+      const currentBufferPath = await nvim.commandOutput(`echo expand("%")`)
+      assert.equal(currentBufferPath, "test/examples.rb")
+    }));
+
   it("handles method matches", () =>
     withVim(async nvim => {
       await nvim.commandOutput(`echo jump_from_treesitter#jump_to("method")`)
