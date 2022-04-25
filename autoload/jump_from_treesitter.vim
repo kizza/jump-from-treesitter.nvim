@@ -46,7 +46,7 @@ function! jump_from_treesitter#grep(token) abort
 endfunction
 
 function! jump_from_treesitter#grep_with(query) abort
-  let output = execute('silent !rg "'.a:query.'" --vimgrep')
+  let output = execute('silent !rg "'.a:query.'" --vimgrep --case-sensitive')
   redraw!
   let lines = split(output, "\n")
   if len(lines) == 4 && lines[3] == "shell returned 1"
