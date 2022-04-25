@@ -4,8 +4,17 @@ endif
 let s:loaded = 1
 
 function! jump_from_treesitter#jump()
-  let token = luaeval("require'jump-from-treesitter'.get_text()")
-  call jump_from_treesitter#jump_to(token)
+  if &filetype == "eruby"
+    let l:token = jump_from_treesitter#embedded_template#parse_token_under_cursor()
+  else
+    let l:token = v:lua.require'jump_from_treesitter'.parse_token_under_cursor()
+  endif
+
+  call jump_from_treesitter#jump_to(l:token)
+endfunction
+
+function! jump_from_treesitter#allow_fallback()
+  return &filetype != "eruby"
 endfunction
 
 function! jump_from_treesitter#jump_to(token) abort
@@ -13,9 +22,11 @@ function! jump_from_treesitter#jump_to(token) abort
   if len(results) > 0
     call jump_from_treesitter#handle_results(results, query)
   else
-    let klass = jump_from_treesitter#parse_class(a:token)
-    if klass != ""
-      call jump_from_treesitter#jump_to(klass)
+    let resolved_klass = jump_from_treesitter#parse_class(a:token)
+    if resolved_klass != ""
+      call jump_from_treesitter#jump_to(resolved_klass)
+    elseif jump_from_treesitter#allow_fallback() == v:false
+      echo 'No definition found for "'.a:token.'"'
     else
       if exists("g:jump_from_treesitter_fallback")
         execute(g:jump_from_treesitter_fallback)

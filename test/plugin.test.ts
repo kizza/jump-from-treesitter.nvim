@@ -1,7 +1,41 @@
 import assert from "assert";
 import {withVim} from "./helpers/vim";
+import {populateBuffer} from "./helpers/buffer";
+import {callLua, callVim} from "./helpers/call";
 
 describe("jump-from-treesitter", () => {
+  describe("embedded template", () => {
+    it("parses embedded code", () =>
+      withVim(async nvim => {
+        await populateBuffer(nvim, "<html><% nope %> break <%= on|e.two %></html>", "eruby");
+        const [code, column] = await callVim(nvim, `jump_from_treesitter#embedded_template#parse_executable_block()`)
+
+        assert.equal(code, " one.two ")
+        assert.equal(column, 4)
+      }));
+
+    it("returns range", () =>
+      withVim(async nvim => {
+        const result = await callLua<string[]>(nvim, "jump_from_treesitter", `parse_token_from_string("one.two", 5)`)
+
+        assert.equal(result.toString(), [1, 5, 1, 7].toString())
+      }));
+
+    it("returns token", () =>
+      withVim(async nvim => {
+        await populateBuffer(nvim, "<html><% nope %> break <%= on|e.two %></html>", "eruby");
+        const token = await callVim(nvim, `jump_from_treesitter#embedded_template#parse_token_under_cursor()`)
+        assert.equal(token, "one")
+      }));
+
+    it("returns resolved module scope", () =>
+      withVim(async nvim => {
+        await populateBuffer(nvim, "<html><% nope %> break <%= One::T|wo %></html>", "eruby");
+        const token = await callVim(nvim, `jump_from_treesitter#embedded_template#parse_token_under_cursor()`)
+        assert.equal(token, "One::Two")
+      }));
+  })
+
   it("loads the test vimrc", () =>
     withVim(async nvim => {
       const loaded = (await nvim.getVar("test_vimrc_loaded")) as boolean;
@@ -41,7 +75,7 @@ describe("jump-from-treesitter", () => {
     withVim(async nvim => {
       await nvim.setVar("jump_from_treesitter_fallback", "echo 'custom fallback'")
       const result = await nvim.commandOutput(`call jump_from_treesitter#jump_to("F_oo")`)
-      assert(result.indexOf("custom fallback") > 0)
+      assert(result.indexOf("custom fallback") >= 0)
     }));
   [
     [
@@ -67,7 +101,7 @@ describe("jump-from-treesitter", () => {
         await nvim.command(`call setpos(".", [0, ${cursorIndex + 1}, ${cursorX + 1}, 0])`);
 
         const result = await nvim.commandOutput(
-          `echo luaeval("require'jump-from-treesitter'.get_text()")`
+          `echo luaeval("require'jump_from_treesitter'.parse_token_from_buffer()")`
         )
         assert.equal(result, output, `Trying ${input}`);
       }))
