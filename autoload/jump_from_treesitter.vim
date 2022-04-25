@@ -38,8 +38,15 @@ function! jump_from_treesitter#jump_to(token) abort
 endfunction
 
 function! jump_from_treesitter#grep(token) abort
-  if tolower(a:token) ==# a:token
+  if stridx(a:token, "@") == 0
+    return jump_from_treesitter#grep_with('^[^\#]*'.a:token.'\s?=')
+  " A constsnt
+  elseif toupper(a:token) ==# a:token
+    return jump_from_treesitter#grep_with('^[^\#]*'.toupper(a:token).'\s?=')
+  " A mtehod
+  elseif tolower(a:token) ==# a:token
     return jump_from_treesitter#grep_with('^[^\#]*def '.a:token.'(\s|$|\()')
+  " A class
   else
     return jump_from_treesitter#grep_with('^[^\#]*class '.a:token.'(\s|$)')
   end
