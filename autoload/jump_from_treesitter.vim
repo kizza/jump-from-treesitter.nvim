@@ -3,7 +3,11 @@ if get(s:, 'loaded')
 endif
 let s:loaded = 1
 
+let s:attempts = []
+
 function! jump_from_treesitter#jump()
+  let s:attempts = []
+
   if &filetype == "eruby"
     let l:token = jump_from_treesitter#embedded_template#parse_token_under_cursor()
   else
@@ -18,6 +22,7 @@ function! jump_from_treesitter#allow_fallback()
 endfunction
 
 function! jump_from_treesitter#jump_to(token) abort
+  let s:attempts+= [a:token]
   let [results, query] = jump_from_treesitter#grep(a:token)
   if len(results) > 0
     call jump_from_treesitter#handle_results(results, query)
@@ -26,9 +31,10 @@ function! jump_from_treesitter#jump_to(token) abort
     if resolved_klass != ""
       call jump_from_treesitter#jump_to(resolved_klass)
     elseif jump_from_treesitter#allow_fallback() == v:false
-      echo 'No definition found for "'.a:token.'"'
+      echo "No definition found with " . join(s:attempts, " or ")
     else
       if exists("g:jump_from_treesitter_fallback")
+        echo "No definition found with " . join(s:attempts, " or ")
         execute(g:jump_from_treesitter_fallback)
       else
         echo 'No definition found for "'.a:token.'". Set g:jump_from_treesitter_fallback to set a fallback'
