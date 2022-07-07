@@ -126,7 +126,7 @@ describe("jump-from-treesitter", () => {
           await nvim.command(`call setpos(".", [0, ${cursorIndex + 1}, ${cursorX + 1}, 0])`);
 
           const result = await nvim.commandOutput(
-            `echo luaeval("require'jump_from_treesitter'.parse_token_from_buffer()")`
+            `echo luaeval("require'jump_from_treesitter'.parse_token_under_cursor()")`
           )
           assert.equal(result, output, `Trying ${input}`);
         }))
