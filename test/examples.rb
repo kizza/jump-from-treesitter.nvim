@@ -3,6 +3,8 @@ class Token
     # Example
   end
 
+  scope :a_scope, -> { where(foo: false) }
+
   def self.self_method
     # Example
   end

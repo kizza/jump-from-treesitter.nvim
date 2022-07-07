@@ -79,6 +79,13 @@ describe("jump-from-treesitter", () => {
         assert.equal(currentBufferPath, "test/examples.rb")
       }));
 
+    it("handles scope matches", () =>
+      withVim(async nvim => {
+        await nvim.commandOutput(`echo jump_from_treesitter#jump_to("a_scope")`)
+        const currentBufferPath = await nvim.commandOutput(`echo expand("%")`)
+        assert.equal(currentBufferPath, "test/examples.rb")
+      }));
+
     it("jumps to matched line number", () =>
       withVim(async nvim => {
         await nvim.commandOutput(`echo jump_from_treesitter#jump_to("method")`)

@@ -46,13 +46,13 @@ endfunction
 function! jump_from_treesitter#grep(token) abort
   if stridx(a:token, "@") == 0
     return jump_from_treesitter#grep_with('^[^\#]*'.a:token.'\s?=')
-  " A constsnt
+  " Uppercase: A constsnt
   elseif toupper(a:token) ==# a:token
     return jump_from_treesitter#grep_with('^[^\#]*'.toupper(a:token).'\s?=')
-  " A mtehod
+  " Lowercase: A method
   elseif tolower(a:token) ==# a:token
-    return jump_from_treesitter#grep_with('^[^\#]*def (self\.)?'.a:token.'(\s|$|\(|;)')
-  " A class/module
+    return jump_from_treesitter#grep_with('^[^\#]*(def|scope) (self\.|:)?'.a:token.'(\s|$|\(|;|,)')
+  " Mixedcase: A class/module
   else
     return jump_from_treesitter#grep_with('^[^\#]*(module|class) '.a:token.'(\s|$)')
   end
