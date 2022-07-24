@@ -84,9 +84,11 @@ function! jump_from_treesitter#handle_results(results, query)
     let line_number = bits[1]
     execute("edit +".line_number." ".path)
   else
-    call fzf#vim#grep(
-      \ 'rg --column --line-number --no-heading --color=always --smart-case -- '.shellescape(a:query), 1,
-      \ fzf#vim#with_preview()
-      \ )
+    if exists("fzf#vim#grep")
+      call fzf#vim#grep(
+        \ 'rg --column --line-number --no-heading --color=always --smart-case -- '.shellescape(a:query), 1,
+        \ fzf#vim#with_preview()
+        \ )
+    end
   end
 endfunction
