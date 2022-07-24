@@ -1,19 +1,23 @@
 import assert from "assert";
-import {withVim} from "./helpers/vim";
-import {populateBuffer} from "./helpers/buffer";
+import {getBuffer, setBuffer, vimRunner} from "nvim-test-js";
 import {callLua, callVim} from "./helpers/call";
+import * as path from "path";
+
+const withVim = vimRunner(
+  {vimrc: path.resolve(__dirname, "helpers", "vimrc.vim")}
+)
 
 describe("jump-from-treesitter", () => {
   it("loads the test vimrc", () =>
     withVim(async nvim => {
-      const loaded = (await nvim.getVar("test_vimrc_loaded")) as boolean;
+      const loaded = (await nvim.getVar("jump_from_treesitter_loaded")) as boolean;
       assert.equal(loaded, true);
     }));
 
   describe("embedded template", () => {
     it("parses embedded code", () =>
       withVim(async nvim => {
-        await populateBuffer(nvim, "<html><% nope %> break <%= on|e.two %></html>", "eruby");
+        await setBuffer(nvim, "<html><% nope %> break <%= on|e.two %></html>", "eruby");
         const [code, column] = await callVim(nvim, `jump_from_treesitter#embedded_template#parse_executable_block()`)
 
         assert.equal(code, " one.two ")
@@ -29,14 +33,14 @@ describe("jump-from-treesitter", () => {
 
     it("returns token", () =>
       withVim(async nvim => {
-        await populateBuffer(nvim, "<html><% nope %> break <%= on|e.two %></html>", "eruby");
+        await setBuffer(nvim, "<html><% nope %> break <%= on|e.two %></html>", "eruby");
         const token = await callVim(nvim, `jump_from_treesitter#embedded_template#parse_token_under_cursor()`)
         assert.equal(token, "one")
       }));
 
     it("returns resolved module scope", () =>
       withVim(async nvim => {
-        await populateBuffer(nvim, "<html><% nope %> break <%= One::T|wo %></html>", "eruby");
+        await setBuffer(nvim, "<html><% nope %> break <%= One::T|wo %></html>", "eruby");
         const token = await callVim(nvim, `jump_from_treesitter#embedded_template#parse_token_under_cursor()`)
         assert.equal(token, "One::Two")
       }));
@@ -54,7 +58,6 @@ describe("jump-from-treesitter", () => {
       withVim(async nvim => {
         await nvim.commandOutput(`echo jump_from_treesitter#jump_to("Module::Token")`)
         const currentBufferPath = await nvim.commandOutput(`echo expand("%")`)
-        console.log("foo", currentBufferPath)
         assert.equal(currentBufferPath, "test/examples.rb")
       }));
 

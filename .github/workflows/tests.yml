@@ -3,7 +3,7 @@ name: Tests
 on:
   push:
     branches:
-      - master
+      - main
   pull_request:
 
 jobs:
@@ -11,18 +11,16 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        os: [ubuntu-latest, macos-latest]
+        os: [ubuntu-18.04, macos-latest]
         node: ['12']
         cc: [gcc]
         include:
-          - os: ubuntu-latest
-            NVIM_NIGHTLY: nvim-linux64.tar.gz
-            NVIM_BIN_PATH: nvim-linux64/bin
+          - os: ubuntu-18.04
+            NVIM_SLUG: nvim-linux64
             RG_FILE: ripgrep-13.0.0-x86_64-unknown-linux-musl.tar.gz
             RG_BIN_PATH: ripgrep-13.0.0-x86_64-unknown-linux-musl
           - os: macos-latest
-            NVIM_NIGHTLY: nvim-macos.tar.gz
-            NVIM_BIN_PATH: nvim-osx64/bin
+            NVIM_SLUG: nvim-macos
             RG_FILE: ripgrep-13.0.0-x86_64-apple-darwin.tar.gz
             RG_BIN_PATH: ripgrep-13.0.0-x86_64-apple-darwin
 
@@ -42,9 +40,9 @@ jobs:
 
       - name: Install neovim
         run: |
-          curl -LO "https://github.com/neovim/neovim/releases/download/nightly/${{ matrix.NVIM_NIGHTLY }}"
-          tar xzf ${{ matrix.NVIM_NIGHTLY }}
-          echo "$(pwd)/${{ matrix.NVIM_BIN_PATH }}" > $GITHUB_PATH
+          curl -LO "https://github.com/neovim/neovim/releases/download/nightly/${{ matrix.NVIM_SLUG }}.tar.gz"
+          tar xzf ${{ matrix.NVIM_SLUG }}.tar.gz
+          echo "$(pwd)/${{ matrix.NVIM_SLUG }}/bin" >> $GITHUB_PATH
 
       - name: Install ripgrep
         run: |
@@ -53,19 +51,17 @@ jobs:
           echo "$(pwd)/${{ matrix.RG_BIN_PATH }}" > $GITHUB_PATH
 
       - name: yarn install
-        run: |
-          yarn install --frozen-lockfile
-          echo "$(pwd)/node_modules/.bin" > $GITHUB_PATH
+        run: yarn install --frozen-lockfile
 
-      - name: Compile tree-sitter grammar
-        run: nvim --headless -u "$(pwd)/test/helpers/vimrc" -c "TSInstallSync ruby" -c "q"
+      - name: Compile tree-sitter grammars
+        run: |
+          nvim --headless -u "$(pwd)/test/helpers/vimrc.vim" -c "TSInstallSync ruby" -c "q"
 
       - name: Run tests
         env:
           NODE_ENV: test
         run: |
-          echo $PATH
-          which nvim
-          which rg
+          nvim --version
           rg --version
+          # rg "^[^\#]*(def|scope) (self\.|:)?method(\s|$|\(|;|,)"
           yarn test
