@@ -6,14 +6,13 @@
     "@types/mocha": "^5.2.7",
     "@types/node": "^12.7.7",
     "mocha": "^6.2.0",
-    "napa": "^3.0.0",
     "neovim": "^4.5.0",
+    "nvim-treesitter": "https://github.com/nvim-treesitter/nvim-treesitter",
     "tree-sitter-cli": "^0.20.1",
     "ts-node": "^8.4.1",
     "typescript": "^3.6.3"
   },
   "scripts": {
-    "install": "napa nvim-treesitter/nvim-treesitter",
     "test": "mocha --require ts-node/register --exit test/**/*.test.ts"
   },
   "repository": {
