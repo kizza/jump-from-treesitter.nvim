@@ -54,7 +54,6 @@ describe("jump-from-treesitter", () => {
       withVim(async nvim => {
         await nvim.commandOutput(`echo jump_from_treesitter#jump_to("Module::Token")`)
         const currentBufferPath = await nvim.commandOutput(`echo expand("%")`)
-        console.log("foo", currentBufferPath)
         assert.equal(currentBufferPath, "test/examples.rb")
       }));
 
