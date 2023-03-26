@@ -31,10 +31,10 @@ function! jump_from_treesitter#jump_to(token) abort
     if resolved_klass != ""
       call jump_from_treesitter#jump_to(resolved_klass)
     elseif jump_from_treesitter#allow_fallback() == v:false
-      echo "No definition found with " . join(s:attempts, " or ")
+      echo "No definition found with: " . join(s:attempts, " or ")
     else
       if exists("g:jump_from_treesitter_fallback")
-        echo "No definition found with " . join(s:attempts, " or ")
+        echo "No definition found with: " . join(s:attempts, " or ")
         execute(g:jump_from_treesitter_fallback)
       else
         echo 'No definition found for "'.a:token.'". Set g:jump_from_treesitter_fallback to set a fallback'
