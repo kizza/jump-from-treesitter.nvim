@@ -28,12 +28,12 @@ function M.parse_token_under_cursor()
   end
 
   local tokens = {}
-  local token = vim.treesitter.query.get_node_text(current_node, 0)
+  local token = vim.treesitter.get_node_text(current_node, 0)
   table.insert(tokens, 1, token)
 
   local parent = current_node:parent()
   while parent and parent:type() == "scope_resolution" do
-    local token = vim.treesitter.query.get_node_text(parent, 0)
+    local token = vim.treesitter.get_node_text(parent, 0)
     if line ~= "" and not vim.tbl_contains(tokens, token) then
       table.insert(tokens, 1, token)
     end
