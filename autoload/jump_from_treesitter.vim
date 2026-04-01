@@ -84,9 +84,21 @@ function! jump_from_treesitter#handle_results(results, query)
     let line_number = bits[1]
     execute("edit +".line_number." ".path)
   else
-    call fzf#vim#grep(
-      \ 'rg --column --line-number --no-heading --color=always --smart-case -- '.shellescape(a:query), 1,
-      \ fzf#vim#with_preview()
-      \ )
+    lua << EOF
+      local query = vim.fn.eval("a:query") -- Cross into vim context for variable
+
+      -- Favour snacks if found
+      local ok, snacks = pcall(require, "snacks")
+      if ok then
+        snacks.picker.grep({search = query})
+      else
+        -- Fallback to vim fzf
+        vim.fn["fzf#vim#grep"](
+          "rg --column --line-number --no-heading --color=always --smart-case -- " .. vim.fn.shellescape(query),
+          1,
+          vim.fn["fzf#vim#with_preview"]()
+        )
+      end
+EOF
   end
 endfunction
