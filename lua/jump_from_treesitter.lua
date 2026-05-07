@@ -1,5 +1,3 @@
-local ts_utils = require "nvim-treesitter.ts_utils"
-
 local M = {}
 
 local function resolve_scope(node)
@@ -9,20 +7,26 @@ local function resolve_scope(node)
   return node
 end
 
+-- Equivalent-ish to old ts_utils.get_vim_range
+local function get_vim_range(range)
+  local start_row, start_col, end_row, end_col = unpack(range)
+  return { start_row + 1, start_col + 1, end_row + 1, end_col }
+end
+
 function M.parse_token_from_string(text, column)
   local line = 0
   local root_lang_tree = vim.treesitter.get_string_parser(text, "ruby")
-  root_lang_tree:parse()
+  local trees = root_lang_tree:parse()
+  local root = trees[1]:root()
 
-  local root = ts_utils.get_root_for_position(line, column, root_lang_tree)
   local node = root:named_descendant_for_range(line, column, line, column)
   local scope = resolve_scope(node)
 
-  return {ts_utils.get_vim_range({scope:range()})}
+  return get_vim_range({ scope:range() })
 end
 
 function M.parse_token_under_cursor()
-  local current_node = ts_utils.get_node_at_cursor()
+  local current_node = vim.treesitter.get_node()
   if not current_node then
     return "None"
   end

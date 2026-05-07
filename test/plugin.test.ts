@@ -101,7 +101,7 @@ describe("jump-from-treesitter", () => {
       }));
   });
 
-  describe("token under cursor", () =>
+  describe("parse_token_under_cursor", () =>
     [
       [
         ["class |Foo", "end"],
@@ -114,17 +114,12 @@ describe("jump-from-treesitter", () => {
     ].forEach(([input, output]) => {
       it(`resolves "${input}" to "${output}" correctly`, () =>
         withVim(async nvim => {
-          const lines = (Array.isArray(input) ? input : [input]) as string[]
-          const cursorIndex = lines.findIndex(line => line.indexOf("|") !== -1)
-          const cursorX = lines[cursorIndex].indexOf("|")
+          await populateBuffer(nvim, input, "ruby");
 
-          await nvim.command(`set filetype=ruby`);
-          await nvim.buffer.setLines(
-            lines.map(line => line.replace("|", "")),
-            {start: 0, end: 0}
-          )
-          await nvim.command(`call setpos(".", [0, ${cursorIndex + 1}, ${cursorX + 1}, 0])`);
+          // Ensure treesitter has parsed context
+          await nvim.command(`lua vim.treesitter.get_parser():parse()`);
 
+          // Get the node udner the cursor
           const result = await nvim.commandOutput(
             `echo luaeval("require'jump_from_treesitter'.parse_token_under_cursor()")`
           )
